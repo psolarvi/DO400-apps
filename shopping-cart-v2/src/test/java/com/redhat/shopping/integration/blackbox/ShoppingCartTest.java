@@ -22,8 +22,8 @@ import org.mockito.Mockito;
 @Tag("integration")
 public class ShoppingCartTest {
 
-    @BeforeEach
-    static void setup() {
+    @BeforeAll
+    public static void setup() {
         CatalogStorage mockStorage = Mockito.mock(InMemoryCatalogStorage.class);
 
         Mockito.when(mockStorage.containsKey(1)).thenReturn(true);
