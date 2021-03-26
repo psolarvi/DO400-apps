@@ -3,6 +3,8 @@ package com.redhat.shopping.integration.whitebox;
 import com.redhat.shopping.cart.CartService;
 import com.redhat.shopping.catalog.ProductNotFoundInCatalogException;
 import io.quarkus.test.junit.QuarkusTest;
+import jdk.internal.agent.resources.agent;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -12,12 +14,31 @@ import javax.inject.Inject;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.redhat.shopping.catalog.CatalogStorage;
+import com.redhat.shopping.catalog.Product;
+import com.redhat.shopping.catalog.persistence.InMemoryCatalogStorage;
+import io.quarkus.test.junit.QuarkusMock;
+import org.junit.jupiter.api.BeforeAll;
+import org.mockito.Mockito;
+
 @QuarkusTest
 @Tag("integration")
 public class ShoppingCartTest {
 
     @Inject
     CartService cartService;
+
+    @BeforeAll
+	public static void setup() {
+		CatalogStorage mockStorage = Mockito.mock(InMemoryCatalogStorage.class);
+
+		Mockito.when(mockStorage.containsKey(1)).thenReturn(true);
+		Mockito.when(mockStorage.containsKey(9999)).thenReturn(false);
+
+		Mockito.when(mockStorage.get(1)).thenReturn(new Product(1, 100));
+
+		QuarkusMock.installMockForType(mockStorage, CatalogStorage.class);
+	}
 
     @BeforeEach
     void clearCart() {
